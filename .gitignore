@@ -33,6 +33,7 @@ ENV/
 venv/
 env.bak/
 venv.bak/
+/backend/venv
 
 # SQLite database
 *.db
