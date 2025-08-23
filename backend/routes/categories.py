@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from db import SessionLocal  # Importa a sessão do banco de dados
-from models import Category  # Importa o modelo Category
+from db.base import SessionLocal  # Importa a sessão do banco de dados
+from db.models import Category  # Importa o modelo Category
 
 # Criando o blueprint para categorias (conjunto de rotas do recurso Category)
 categories_bp = Blueprint('categories', __name__)
