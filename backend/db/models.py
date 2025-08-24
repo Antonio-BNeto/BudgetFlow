@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Enum # Importa do SQLAlchemy os tipos e funções necessários para definir colunas de tabelas no banco de dados:
 from sqlalchemy.orm import relationship # Definir um relacionamento entre tabelas
-from db.base import Base  # Base declarativa do SQLAlchemy
+from db.db import Base  # Base declarativa do SQLAlchemy
 import enum # módulo do Python para criar tipos enumeradores
 
 class Category(Base): # Define a tabela de categorias

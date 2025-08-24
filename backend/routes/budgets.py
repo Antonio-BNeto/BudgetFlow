@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from db.base import SessionLocal  # Importa a sessão do banco de dados
+from db.db import SessionLocal  # Importa a sessão do banco de dados
 from db.models import Budget  # Importa o modelo Budgets
 
 # Criando o blueprint para orçamentos (conjunto de rotas do recurso Budget)
