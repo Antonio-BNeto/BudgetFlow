@@ -12,7 +12,7 @@ categories_bp = Blueprint('categories', __name__)
 def get_categories():
     with session_scope() as db:
         categories = db.query(Category).all()  # Consulta todas as categorias
-        return jsonify([{"id": c.id, "name": c.name} for c in categories])  # Retorna as categorias em formato JSON
+        return jsonify([{"category_id": c.category_id, "name": c.name} for c in categories])  # Retorna as categorias em formato JSON
 
 
 # -----------------------------
@@ -31,7 +31,7 @@ def create_category():
         db.add(new_category)  # Adiciona a nova categoria à sessão
         db.flush()  # Garante que a nova categoria tenha um ID gerado
 
-        return jsonify({"id": new_category.id, "name":new_category.name}), 201  # Retorna a nova categoria criada
+        return jsonify({"category_id": new_category.category_id, "name":new_category.name}), 201  # Retorna a nova categoria criada
 
 # -----------------------------
 # PUT /api/categories/<int:category_id> → Atualizar uma categoria que está no banco
@@ -48,7 +48,7 @@ def update_category(category_id):
         category.name = data.get("name", category.name)  # Atualiza o nome da categoria
         db.flush()
 
-        return jsonify({"id": category.id, "name": category.name})  # Retorna a categoria atualizada
+        return jsonify({"category_id": category.category_id, "name": category.name})  # Retorna a categoria atualizada
 
 # -----------------------------
 # DELETE /api/categories/<int:category_id> → Deleta uma categoria que está no banco

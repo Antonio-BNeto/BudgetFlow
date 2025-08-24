@@ -15,7 +15,7 @@ def get_budgets():
 
     return jsonify([
         {
-            "id": b.id_budget,
+            "budget_id": b.budget_id,
             "month": b.month,
             "limit": b.limit,
             "category": b.category.name
@@ -39,7 +39,7 @@ def create_budget():
         db.refresh(new_budget)  # Atualiza o objeto com os dados do banco
     
     return jsonify({
-        "id": new_budget.id_budget,
+        "budget_id": new_budget.budget_id,
         "month": new_budget.month,
         "limit": new_budget.limit,
         "category": new_budget.category.name
@@ -53,7 +53,7 @@ def update_budget(budget_id):
     data = request.json  # Obtém os dados da requisição
 
     with session_scope() as db:
-        budget = db.query(Budget).filter(Budget.id_budget == budget_id).first()  # Busca o orçamento pelo ID
+        budget = db.query(Budget).filter(Budget.budget_id == budget_id).first()  # Busca o orçamento pelo ID
 
         if not budget:
             return jsonify({"error": "Budget not found"}), 404
@@ -66,7 +66,7 @@ def update_budget(budget_id):
         db.refresh(budget)  # Atualiza o objeto com os dados do banco
 
     return jsonify({
-        "id": budget.budget_id,
+        "budget_id": budget.budget_id,
         "month": budget.month,
         "limit": budget.limit,
         "category": budget.category.name if budget.category else None

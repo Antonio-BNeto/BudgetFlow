@@ -12,7 +12,7 @@ transactions_bp = Blueprint('transactions', __name__)
 def get_transactions():
     with session_scope() as db:
         transactions = db.query(Transaction).all()
-        return jsonify([{"id": t.id, "amount": t.amount, "category_id": t.category_id} for t in transactions])
+        return jsonify([{"transaction_id": t.transaction_id, "amount": t.amount, "category_id": t.category_id} for t in transactions])
 
 # -----------------------------
 # POST /api/transactions → criar uma nova transação
@@ -23,7 +23,7 @@ def create_transaction():
     with session_scope() as db:
         new_transaction = Transaction(**data) # desestruturando o dicionário
         db.add(new_transaction)
-        return jsonify({"id": new_transaction.id, "amount": new_transaction.amount, "category_id": new_transaction.category_id}), 201
+        return jsonify({"transaction_id": new_transaction.transaction_id, "amount": new_transaction.amount, "category_id": new_transaction.category_id}), 201
 
 # -----------------------------
 # PUT /api/transactions/<int:transaction_id> → Atualizar uma transação existente
@@ -44,7 +44,7 @@ def update_transaction(transaction_id):
         
         return  jsonify(
             {
-                "id": transaction.transaction_id,
+                "transaction_id": transaction.transaction_id,
                 "amount": transaction.amount,
                 "category_id": transaction.category_id
             }
