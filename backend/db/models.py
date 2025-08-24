@@ -26,7 +26,7 @@ class Transaction(Base): # Define a tabela de transações
     amount = Column(Float, nullable=False)  # Coluna de valor da transação, não pode ser nula
     date = Column(Date, nullable=False)  # Coluna de data da transação, não pode ser nula
     description = Column(String, nullable=True)  # Coluna de descrição da transação, pode ser nula
-    category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)  # Chave estrangeira para a categoria, não pode ser nula
+    category_id = Column(Integer, ForeignKey('categories.category_id'), nullable=False)  # Chave estrangeira para a categoria, não pode ser nula
 
     category = relationship("Category", back_populates="transactions") # Relacionamento com a tabela de categorias
 
@@ -37,6 +37,6 @@ class Budget(Base): # Define a tabela de orçamentos
     budget_id = Column(Integer, primary_key=True, index=True)  # Coluna de ID do orçamento, chave primária e indexada
     month = Column(String, nullable=False)  # Coluna de mês do orçamento, não pode ser nula
     limit = Column(Float, nullable=False)  # Coluna de limite do orçamento, não pode ser nula
-    category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)  # Chave estrangeira para a categoria, não pode ser nula
+    category_id = Column(Integer, ForeignKey('categories.category_id'), nullable=False)  # Chave estrangeira para a categoria, não pode ser nula
 
     category = relationship("Category", back_populates="budgets")  # Relacionamento com a tabela de categorias
