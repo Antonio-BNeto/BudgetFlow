@@ -1,15 +1,14 @@
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 # -----------------------------------------------------------------------------
 # 1) URL do banco (direto no código)
 #    Você pode trocar para PostgreSQL, MySQL etc. se precisar.
 # -----------------------------------------------------------------------------
-DATABASE_URL = "sqlite:///./budgetflow.db"  # ou seu banco real
+DATABASE_URL = "sqlite:///./instance/budgetflow.db"  # ou seu banco real
 
 # Para SQLite, é necessário um argumento especial chamado "check_same_thread"
 # que permite que a conexão seja compartilhada entre diferentes threads.
