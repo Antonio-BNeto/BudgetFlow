@@ -34,7 +34,7 @@ def create_category():
         return jsonify({"id": new_category.id, "name":new_category.name}), 201  # Retorna a nova categoria criada
 
 # -----------------------------
-# PUT /api/categories → Atualizar uma categoria que está no banco
+# PUT /api/categories/<int:category_id> → Atualizar uma categoria que está no banco
 # -----------------------------
 @categories_bp.route("/<int:category_id>", methods=["PUT"])
 def update_category(category_id):
@@ -51,12 +51,12 @@ def update_category(category_id):
         return jsonify({"id": category.id, "name": category.name})  # Retorna a categoria atualizada
 
 # -----------------------------
-# DELETE /api/categories → Deleta uma categoria que está no banco
+# DELETE /api/categories/<int:category_id> → Deleta uma categoria que está no banco
 # -----------------------------
-@categories_bp.route("<int:category_id>", methods=["DELETE"])
+@categories_bp.route("/<int:category_id>", methods=["DELETE"])
 def delete_category(category_id):
     with session_scope() as db:
-        category = db.query(Category).filter(Category.id == category_id).first()
+        category = db.query(Category).filter(Category.category_id == category_id).first()
 
         if not category:
             return jsonify({"error": "Category not found"}), 404

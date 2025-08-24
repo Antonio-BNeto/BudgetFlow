@@ -46,14 +46,14 @@ def create_budget():
     }), 201  # Retorna o novo orçamento criado
 
 # -----------------------------
-# PUT /api/budgets → atualizar um orçamento existente
+# PUT /api/budgets/<int: budget_id> → atualizar um orçamento existente
 # -----------------------------
-@budgets_bp.route("<int:id_budget>", methods=["PUT"])
-def update_budget(id_budget):
+@budgets_bp.route("/<int:budget_id>", methods=["PUT"])
+def update_budget(budget_id):
     data = request.json  # Obtém os dados da requisição
 
     with session_scope() as db:
-        budget = db.query(Budget).filter(Budget.id_budget == id_budget).first()  # Busca o orçamento pelo ID
+        budget = db.query(Budget).filter(Budget.id_budget == budget_id).first()  # Busca o orçamento pelo ID
 
         if not budget:
             return jsonify({"error": "Budget not found"}), 404
@@ -66,19 +66,19 @@ def update_budget(id_budget):
         db.refresh(budget)  # Atualiza o objeto com os dados do banco
 
     return jsonify({
-        "id": budget.id_budget,
+        "id": budget.budget_id,
         "month": budget.month,
         "limit": budget.limit,
         "category": budget.category.name if budget.category else None
     })
 
 # -----------------------------
-# DELETE /api/budgets/<int: id_budget> → deletar um orçamento existente com base no ID
+# DELETE /api/budgets/<int:budget_id> → deletar um orçamento existente com base no ID
 # -----------------------------
-@budgets_bp.route("/<int:id_budget>", methods=["DELETE"])
-def delete_budget(id_budget):
+@budgets_bp.route("/<int:budget_id>", methods=["DELETE"])
+def delete_budget(budget_id):
     with session_scope() as db:
-        budget = db.query(Budget).filter(Budget.id_budget == id_budget).first()
+        budget = db.query(Budget).filter(Budget.budget_id == budget_id).first()
 
         if not budget:
             return jsonify({"error": "Budget not found"}), 404
@@ -86,4 +86,4 @@ def delete_budget(id_budget):
         db.delete(budget)
         db.flush()
 
-        return jsonify({"message": f"Budget {id_budget} deleted successfully"}), 204
+        return jsonify({"message": f"Budget {budget_id} deleted successfully"}), 204
