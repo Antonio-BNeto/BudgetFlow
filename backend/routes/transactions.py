@@ -8,7 +8,7 @@ transactions_bp = Blueprint('transactions', __name__)
 # -----------------------------
 # GET /api/transactions → listar todas as transações
 # -----------------------------
-@transactions_bp.route('/', methods=['GET'])
+@transactions_bp.route('/transactions', methods=['GET'])
 def get_transactions():
     with session_scope() as db:
         transactions = db.query(Transaction).all()
@@ -17,7 +17,7 @@ def get_transactions():
 # -----------------------------
 # POST /api/transactions → criar uma nova transação
 # -----------------------------
-@transactions_bp.route('/', methods=['POST'])
+@transactions_bp.route('/transactions', methods=['POST'])
 def create_transaction():
     data = request.json
     with session_scope() as db:
@@ -28,7 +28,7 @@ def create_transaction():
 # -----------------------------
 # PUT /api/transactions/<int:transaction_id> → Atualizar uma transação existente
 # -----------------------------
-@transactions_bp.route('/<int:transaction_id>', methods=['PUT'])
+@transactions_bp.route('/transactions/<int:transaction_id>', methods=['PUT'])
 def update_transaction(transaction_id):
     data = request.json
     with session_scope() as db:
@@ -53,7 +53,7 @@ def update_transaction(transaction_id):
 # -----------------------------
 # DELETE /api/transactions/<int:transaction_id> → Deletar uma transação existente
 # -----------------------------
-@transactions_bp.route('/<int:transaction_id>', methods=['DELETE'])
+@transactions_bp.route('/transactions/<int:transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id):
     with session_scope() as db:
         transaction = db.query(Transaction).filter(Transaction.transaction_id == transaction_id).first()

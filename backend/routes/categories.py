@@ -8,7 +8,7 @@ categories_bp = Blueprint('categories', __name__)
 # -----------------------------
 # GET /api/categories → listar todas as categorias
 # -----------------------------
-@categories_bp.route('/', methods=['GET'])
+@categories_bp.route('/categories', methods=['GET'])
 def get_categories():
     with session_scope() as db:
         categories = db.query(Category).all()  # Consulta todas as categorias
@@ -18,7 +18,7 @@ def get_categories():
 # -----------------------------
 # POST /api/categories → criar uma nova categoria
 # -----------------------------
-@categories_bp.route('/', methods=['POST'])
+@categories_bp.route('/categories', methods=['POST'])
 def create_category():
     data = request.json  # Obtém os dados da requisição
     with session_scope() as db:
@@ -36,11 +36,11 @@ def create_category():
 # -----------------------------
 # PUT /api/categories/<int:category_id> → Atualizar uma categoria que está no banco
 # -----------------------------
-@categories_bp.route("/<int:category_id>", methods=["PUT"])
+@categories_bp.route("/categories/<int:category_id>", methods=["PUT"])
 def update_category(category_id):
     data = request.json  # Obtém os dados da requisição
     with session_scope() as db:
-        category = db.query(Category).filter(Category.id == category_id).first()
+        category = db.query(Category).filter(Category.category_id == category_id).first()
 
         if not category:
             return jsonify({"error": "Category not found"}), 404
@@ -53,7 +53,7 @@ def update_category(category_id):
 # -----------------------------
 # DELETE /api/categories/<int:category_id> → Deleta uma categoria que está no banco
 # -----------------------------
-@categories_bp.route("/<int:category_id>", methods=["DELETE"])
+@categories_bp.route("/categories/<int:category_id>", methods=["DELETE"])
 def delete_category(category_id):
     with session_scope() as db:
         category = db.query(Category).filter(Category.category_id == category_id).first()
@@ -63,4 +63,4 @@ def delete_category(category_id):
 
         db.delete(category)  # Deleta categoria
 
-        return jsonify({"Message": "Category deleted successfully"})
+        return jsonify({"Message": "Category deleted successfully"}), 204
