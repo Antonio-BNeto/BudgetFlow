@@ -1,17 +1,14 @@
 from pydantic import BaseModel, Field
 
 class CategoryCreate(BaseModel):
-    """Schema para criação de categoria"""
+    """Schema for category creation"""
     name: str = Field(..., min_length=1, max_length=100)
 
-    class Config:
-        orm_mode = True
-
-
 class CategoryResponse(BaseModel):
-    """Schema de resposta para categoria"""
+    """Schema for category response"""
     category_id: int
     name: str
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
