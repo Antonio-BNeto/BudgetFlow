@@ -1,43 +1,43 @@
-import pytest 
-from app import app
-from db.db import Base, engine
-
-# configura o cliente de teste do Flask
-@pytest.fixture
-def client():
-    # Ativa o modo de teste
-    app.config['TESTING'] = True
-
-    # Cria as tabelas (em memória ou no DB configurado em db/db.py)
-    Base.metadata.create_all(bind=engine)
-
-    with app.test_client() as client:
-        yield client
-
-    # Limpa  as tabelas depois dos testes
-    Base.metadata.drop_all(bind=engine)
-
 # -----------------------------
 # Teste: criar categoria
 # -----------------------------
 def test_create_category(client):
-    response = client.post('/api/categories', json={'name': 'Transporte'})
+    response = client.post('/api/categories', json={'name': 'Food'})
     assert response.status_code == 201
     
     data = response.get_json()
-    assert data['name'] == 'Transporte'
-    assert 'category_id' in data #garante que o ID foi gerado
+    assert data['name'] == 'Food'
 
 # -----------------------------
 # Teste: listar categorias
 # -----------------------------
 def test_get_categories(client):
-    # Primeiro cria uma categoria para garantir que haja pelo menos uma categoria
-    client.post('/api/categories', json={'name': 'Alimentação'})
-    
     response = client.get('/api/categories')
     assert response.status_code == 200
-    
     data = response.get_json()
     assert isinstance(data, list)
-    assert any(c['name'] == 'Alimentação' for c in data) # verifica se a categoria está na lista
+    assert any(cat['name'] == 'Food' for cat in data)
+
+# -----------------------------
+# Teste: Atualizar categoria
+# -----------------------------
+def test_update_category(client):
+    # Primeiro cria uma categoria para garantir que haja pelo menos uma categoria
+    create_resp = client.post('/api/categories', json={'name': 'Transport'})
+    category_id = create_resp.get_json()['category_id']
+
+    # Atualiza a categoria
+    update_resp = client.put(f'/api/categories/{category_id}', json={'name': 'Entertainment'})
+    assert update_resp.status_code == 200
+    assert update_resp.get_json()['name'] == 'Entertainment'
+
+# -----------------------------
+# Teste: Deletar categoria
+# -----------------------------
+def test_delete_category(client):
+    # Primeiro cria uma categoria para garantir que haja pelo menos uma categoria
+    create_resp = client.post('/api/categories', json={'name': 'ToDelete'})
+    category_id = create_resp.get_json()['category_id']
+    
+    delete_resp = client.delete(f'/api/categories/{category_id}')
+    assert delete_resp.status_code == 204
