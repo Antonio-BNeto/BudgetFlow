@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from db.db import session_scope  # Importa o gerenciador de contexto da sessão
 from db.models import Budget  # Importa o modelo Budgets
+from schemas.budgets import BudgetCreate, BudgetResponse
+from datetime import date
 
 # Criando o blueprint para orçamentos (conjunto de rotas do recurso Budget)
 budgets_bp = Blueprint('budgets', __name__)
@@ -10,80 +12,91 @@ budgets_bp = Blueprint('budgets', __name__)
 # -----------------------------
 @budgets_bp.route('/budgets', methods=['GET'])
 def get_budgets():
-    with session_scope() as db:
-        budgets = db.query(Budget).all() # Retorna uma lista com todos os orçamentos
+    with session_scope() as session:
+        budgets = session.query(Budget).all() # Retorna uma lista com todos os orçamentos
 
-        return jsonify([
-            {
-                "budget_id": b.budget_id,
-                "month": b.month,
-                "limit": b.limit,
-                "category_id": b.category_id
-            } 
+        response = [
+            BudgetResponse.model_validate(b).model_dump()
             for b in budgets
-        ])
+        ]
+
+        return jsonify(response), 200
 
 # -----------------------------
 # POST /api/budgets → criar um novo orçamento
 # -----------------------------
 @budgets_bp.route('/budgets', methods=['POST'])
 def create_budget():
-    
-    data = request.json  # Obtém os dados da requisição
-    
-    with session_scope() as db:
-        new_budget = Budget(**data) # Cria uma nova instancia do orçamento (**data) faz uma atribuição dos valores do dicionário data para os atributos do objeto Budget
-        db.add(new_budget)  # Adiciona o novo orçamento à sessão
-        db.flush() # Garante que o novo orçamento tenha um ID gerado
+    try:
+        budget_data = BudgetCreate(**request.json)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    with session_scope() as session:
+        month_str = budget_data.month
+        year, month = map(int, month_str.split("-"))
+        db_date = date(year, month, 1)
         
-        db.refresh(new_budget)  # Atualiza o objeto com os dados do banco
-    
-        return jsonify({
-            "budget_id": new_budget.budget_id,
-            "month": new_budget.month,
-            "limit": new_budget.limit,
-            "category_id": new_budget.category_id
-        }), 201  # Retorna o novo orçamento criado
+        new_budget = Budget(
+            month=db_date,
+            limit=budget_data.limit,
+            category_id=budget_data.category_id
+        )
+        
+        session.add(new_budget)
+        session.flush()
+        session.refresh(new_budget)
+
+        response = BudgetResponse.model_validate(new_budget).model_dump()
+        return jsonify(response), 201
 
 # -----------------------------
 # PUT /api/budgets/<int: budget_id> → atualizar um orçamento existente
 # -----------------------------
 @budgets_bp.route("/budgets/<int:budget_id>", methods=["PUT"])
 def update_budget(budget_id):
-    data = request.json  # Obtém os dados da requisição
+    try:
+        budget_data = BudgetCreate(**request.json)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-    with session_scope() as db:
-        budget = db.query(Budget).filter(Budget.budget_id == budget_id).first()  # Busca o orçamento pelo ID
+    with session_scope() as session:
+        budget = (
+            session.query(Budget)
+            .filter(Budget.budget_id == budget_id)
+            .first()
+        )  # Busca o orçamento pelo ID
 
         if not budget:
             return jsonify({"error": "Budget not found"}), 404
         
-        # Atualiza os atributos do orçamento com os novos dados
-        for key, value in data.items():
-            setattr(budget, key, value)
+        month_str = budget_data.month
+        year, month = map(int, month_str.split("-"))
+        db_date = date(year, month, 1)
 
-        db.flush()  # Garante que as alterações sejam enviadas ao banco de dados
-        db.refresh(budget)  # Atualiza o objeto com os dados do banco
+        budget.month = db_date
+        budget.limit = budget_data.limit
+        budget.category_id = budget_data.category_id
 
-        return jsonify({
-            "budget_id": budget.budget_id,
-            "month": budget.month,
-            "limit": budget.limit,
-            "category_id": budget.category_id if budget.category else None
-        }), 200
+        session.flush()  # Garante que as alterações sejam enviadas ao banco de dados
+        response = BudgetResponse.model_validate(budget).model_dump()
+        return jsonify(response), 200
 
 # -----------------------------
 # DELETE /api/budgets/<int:budget_id> → deletar um orçamento existente com base no ID
 # -----------------------------
 @budgets_bp.route("/budgets/<int:budget_id>", methods=["DELETE"])
 def delete_budget(budget_id):
-    with session_scope() as db:
-        budget = db.query(Budget).filter(Budget.budget_id == budget_id).first()
+    with session_scope() as session:
+        budget = (
+            session.query(Budget)
+            .filter(Budget.budget_id == budget_id)
+            .first()
+        )
 
         if not budget:
             return jsonify({"error": "Budget not found"}), 404
 
-        db.delete(budget)
-        db.flush()
+        session.delete(budget)
 
         return jsonify({"message": "Budget deleted successfully"}), 204
